@@ -20,7 +20,8 @@ def changeFileExtension(fileName):
 	
 def changeIfMov(op, args):
     aux = op
-    
+    auxArgs = args
+
     if (op == "MOV"):
         arg0isReg = re.search('[a-zA-Z]+', args[0])
         arg0isMem = re.search('\[.+\]', args[0])
@@ -28,6 +29,11 @@ def changeIfMov(op, args):
         arg1isReg = re.search('[a-zA-Z]+', args[1])
         arg1isMem = re.search('\[.+\]', args[1])
         arg1isIme = re.search('[0-9]+', args[1])
+
+        if arg0isMem:
+            auxArgs[0] = re.sub('\[|\]', "", args[0])
+        if arg1isMem:
+            auxArgs[1] = re.sub('\[|\]', "", args[1])
 
         if (arg0isReg and arg1isReg):
             aux = "MOV_RR"
@@ -40,7 +46,7 @@ def changeIfMov(op, args):
         elif (arg0isMem and arg1isIme):
             aux = "MOV_MI"
 
-    return aux
+    return {"op": aux, "args": auxArgs}
 #Transforma uma linha de código em um dicionário com as instruções
 #@return Dictionary: op: string com as operações, args: vetor com os argumentos
 def prepareProgLine(line):
@@ -54,9 +60,7 @@ def prepareProgLine(line):
     else:
         args = []
     
-    op = changeIfMov(op, args)
-    
-    return {"op": op, "args": args}
+    return changeIfMov(op, args)
 
 #Remover todas informações que não são relevantes para o mapeamento dos OPCODES e REGCODES
 def clearCodesLine(line):
