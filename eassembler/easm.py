@@ -16,23 +16,52 @@ def mapFile(fileName):
 
 #Alterar extensão do arquivo para easm
 def changeFileExtension(fileName):
-	return re.sub('\..*', ".easm", fileName)
+	return re.sub('\..*', ".run", fileName)
 	
+def changeIfMov(op, args):
+    aux = op
+    
+    if (op == "MOV"):
+        arg0isReg = re.search('[a-zA-Z]+', args[0])
+        arg0isMem = re.search('\[.+\]', args[0])
+        arg0isIme = re.search('[0-9]+', args[0])
+        arg1isReg = re.search('[a-zA-Z]+', args[1])
+        arg1isMem = re.search('\[.+\]', args[1])
+        arg1isIme = re.search('[0-9]+', args[1])
+
+        if (arg0isReg and arg1isReg):
+            aux = "MOV_RR"
+        elif (arg0isReg and arg1isMem):
+            aux = "MOV_RM"
+        elif (arg0isMem and arg1isReg):
+            aux = "MOV_MR"
+        elif (arg0isReg and arg1isIme):
+           aux = "MOV_RI"
+        elif (arg0isMem and arg1isIme):
+            aux = "MOV_MI"
+
+    return aux
 #Transforma uma linha de código em um dicionário com as instruções
 #@return Dictionary: op: string com as operações, args: vetor com os argumentos
 def prepareProgLine(line):
     aux = re.sub('(\t|\n|;.*)+', "", line).strip(" ")
     aux = re.sub(', +', ",", aux).split(' ')
-    d = {"op": aux[0]}
+
+    op = aux[0]
+
     if (len(aux) > 1):
-        d["args"] = aux[1].split(',')
+        args = aux[1].split(',')
     else:
-        d["args"] = []
-    return d
+        args = []
+    
+    op = changeIfMov(op, args)
+    
+    return {"op": op, "args": args}
 
 #Remover todas informações que não são relevantes para o mapeamento dos OPCODES e REGCODES
 def clearCodesLine(line):
     return re.sub('(\t| |\n|;.*)+',"", line)
+
 #Transformar dicionario em código de máquina
 #@return String
 def instructionsToMC(instructions, ops, regs):
@@ -51,8 +80,10 @@ def compileFile(f, ops, regs):
 	
     for line in f:
         instructions = prepareProgLine(line)
-        code = instructionsToMC(instructions, ops, regs)
-        compiledFile.write(code)
+        #print(instructions)
+        if len(instructions["op"]) > 0:
+            code = instructionsToMC(instructions, ops, regs)
+            compiledFile.write(code)
     return 0
 
 
