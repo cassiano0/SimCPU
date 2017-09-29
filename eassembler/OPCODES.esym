@@ -1,0 +1,29 @@
+;
+; OPERATION SYMBOL TABLE - opcodes (numbered from zero)
+; by laplima
+;
+; Labels:
+;	Rx, Ry: registers
+;	M: memory contents
+;	I: immediate value
+;
+
+NOP				; NOP				no operation
+HALT    		; HALT				stop processor
+MOV_RR  		; MOV Rx,Ry 		move Rx <- Ry
+MOV_RM  		; MOV Rx,[M]		move Rx <- M
+MOV_MR  		; MOV [M],Rx		move M <- Rx
+MOV_RI  		; MOV Rx,I 			move Rx <- I
+MOV_MI  		; MOV [M],I 		move M <- I
+ADD     		; ADD Rx,Ry 		Rx <- Rx + Ry
+SUB     		; SUB Rx,Ry 		Rx <- Rx - Ry
+CMP     		; CMP Rx,Ry 		FL <- Rx-Ry
+JMP     		; JMP I 			I = absolute address
+JZ      		; JZ I 				I = relative jump if FL == 0
+JG      		; JG I 				I = relative jump if FL > 0
+JL      		; JL I 				I = relative jump if FL < 0
+OUT     		; OUT Rx 			prints out Rx value
+INC				; INC Rx 			Rx <- Rx + 1
+DEC				; DEC Rx 			Rx <- Rx - 1
+MUL				; MUL Rx,Ry 		Rx <- Rx * Ry
+DIV				; DIV Rx,Ry 		Rx <- Rx / Ry; Ry <- Rx % Ry
